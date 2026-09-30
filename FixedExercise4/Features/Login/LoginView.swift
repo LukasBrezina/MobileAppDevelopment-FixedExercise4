@@ -1,6 +1,6 @@
 //
 //  LoginView.swift
-//  FixedExercises
+//  FixedExercise4
 //
 //  Created by Lukas Brezina on 28.09.26.
 //
@@ -15,23 +15,15 @@ struct LoginView: View {
     private var password = "madmad"
     
     @State
-    private var alertTitle = ""
-    
-    @State
-    private var alertContent = ""
-    
-    @State
-    private var alertActive = false
-    
-    @State
     private var isLoading = false
+    
+    @State
+    private var alert: AlertInfo?
     
     @State
     private var loginSuccess = false
     
     private let minHeight: CGFloat = 40
-    
-    private let apiClient = APIClient()
     
     private enum Field {
         case email
@@ -113,33 +105,21 @@ struct LoginView: View {
         }
         .disabled(isLoading)
         .padding()
-        .alert(
-            alertTitle,
-            isPresented: $alertActive) {
-                Button("OK", role: .cancel) {
-                    
-                }
-            } message: {
-                Text(alertContent)
-            }
-            .navigationDestination(isPresented: $loginSuccess, destination: {
-                CountriesView(loginIdToken: user?.idToken ?? "")
-            })
+        .infoAlert($alert)
+        .navigationDestination(isPresented: $loginSuccess) {
+            CountriesView(loginIdToken: user?.idToken ?? "")
+        }
     }
     
     func login() {
         
         guard !email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            alertTitle = "Error"
-            alertContent = "Email missing!"
-            alertActive = true
+            alert = AlertInfo(message: "Email missing!")
             return
         }
         
         guard !password.isEmpty else {
-            alertTitle = "Error"
-            alertContent = "Password missing!"
-            alertActive = true
+            alert = AlertInfo(message: "Password missing!")
             return
         }
         
@@ -149,29 +129,11 @@ struct LoginView: View {
         APIClient.shared.login(username: email, password: password) { user, error in
             isLoading = false
             if let error {
-                alertTitle = "Error"
-                alertContent = errorMessage(error: error)
-                loginSuccess = false
-                alertActive = true
+                alert = AlertInfo(message: error.message)
             } else if user != nil {
                 self.user = user
                 loginSuccess = true
             }
-        }
-    }
-    
-    private func errorMessage(error: NetworkError) -> String {
-        switch error {
-        case .internalServerError: "Internal Server Error"
-        case .serializationError: "Serialization Error"
-        case .invalidEmail: "Invalid Email"
-        case .wrongEmail: "No account found for this email"
-        case .invalidCredentials: "Invalid Credentials"
-        case .invalidApiUrl: "Invalid API URL"
-        case .noNetworkConnection(let text): "No Network Connection: \(text)"
-        case .unexpectedHttpFormat(let code): "Unexpected response format (status \(code))"
-        case .httpError(let code, let message): "Request failed (status \(code)): \(message ?? "unknown")"
-        case .unexpectedError(let text): "Unexpected Error: \(text)"
         }
     }
 }

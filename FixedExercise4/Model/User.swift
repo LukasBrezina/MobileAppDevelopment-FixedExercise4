@@ -1,6 +1,6 @@
 //
 //  User.swift
-//  FixedExercises
+//  FixedExercise4
 //
 //  Created by Lukas Brezina on 21.09.26.
 //
