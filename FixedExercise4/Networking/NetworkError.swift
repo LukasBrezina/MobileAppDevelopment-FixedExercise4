@@ -17,3 +17,4 @@ enum NetworkError: Error {
     case httpError(statusCode: Int, message: String?)
     case unexpectedError(String)
 }
+

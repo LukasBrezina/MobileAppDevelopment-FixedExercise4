@@ -51,12 +51,18 @@ class APIClient {
                 networkError = .noNetworkConnection(error.localizedDescription)
             } else if let data, let http = urlResponse as? HTTPURLResponse {
                 if (200...299).contains(http.statusCode) {
-                    user = try? JSONDecoder().decode(User.self, from: data)
-                    if user == nil { networkError = .unexpectedHttpFormat(http.statusCode) }
-                } else if let responseError = try? JSONDecoder().decode(ResponseError.self, from: data) {
-                    networkError = responseError.getNetworkError(statusCode: http.statusCode)
+                    do {
+                        user = try JSONDecoder().decode(User.self, from: data)
+                    } catch {
+                        networkError = .unexpectedHttpFormat(http.statusCode)
+                    }
                 } else {
-                    networkError = .httpError(statusCode: http.statusCode, message: nil)
+                    do {
+                        let responseError = try JSONDecoder().decode(ResponseError.self, from: data)
+                        networkError = responseError.getNetworkError(statusCode: http.statusCode)
+                    } catch {
+                        networkError = .httpError(statusCode: http.statusCode, message: nil)
+                    }
                 }
             } else {
                 networkError = .unexpectedError("No data or response")
@@ -90,11 +96,18 @@ class APIClient {
                 networkError = .noNetworkConnection(error.localizedDescription)
             } else if let data, let http = urlResponse as? HTTPURLResponse {
                 if (200...299).contains(http.statusCode) {
-                    countries = try? JSONDecoder().decode(Countries.self, from: data)
-                } else if let responseError = try? JSONDecoder().decode(ResponseError.self, from: data) {
-                    networkError = responseError.getNetworkError(statusCode: http.statusCode)
+                    do {
+                        countries = try JSONDecoder().decode(Countries.self, from: data)
+                    } catch {
+                        networkError = .unexpectedHttpFormat(http.statusCode)
+                    }
                 } else {
-                    networkError = .internalServerError
+                    do {
+                        let responseError = try JSONDecoder().decode(ResponseError.self, from: data)
+                        networkError = responseError.getNetworkError(statusCode: http.statusCode)
+                    } catch {
+                        networkError = .internalServerError
+                    }
                 }
             } else {
                 networkError = .unexpectedError("No data or response")
@@ -104,10 +117,8 @@ class APIClient {
                 completionHandler(countries, networkError)
             }
         }
-        
+
         dataTask.resume()
-        
-        
         
     }
     
