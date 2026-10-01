@@ -106,6 +106,9 @@ struct LoginView: View {
         .disabled(isLoading)
         .padding()
         .infoAlert($alert)
+        .toolbar(.hidden, for: .navigationBar)
+        .navigationTitle("Login Screen")
+        .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(isPresented: $loginSuccess) {
             CountriesView(loginIdToken: user?.idToken ?? "")
         }
