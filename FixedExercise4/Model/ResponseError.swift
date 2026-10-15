@@ -9,7 +9,7 @@ import Foundation
 struct ResponseError: Codable {
     let error: InlineError
     
-    func getNetworkError(statusCode: Int) -> NetworkError {
+    func getNetworkingError(statusCode: Int) -> NetworkingError {
         switch error.message {
         case "INVALID_EMAIL": return .invalidEmail
         case "EMAIL_NOT_FOUND": return .wrongEmail

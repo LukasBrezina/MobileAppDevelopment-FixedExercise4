@@ -1,11 +1,11 @@
 //
-//  NetworkError.swift
+//  NetworkingError.swift
 //  FixedExercise4
 //
 //  Created by Lukas Brezina on 21.09.26.
 //
 
-enum NetworkError: Error {
+enum NetworkingError: Error {
     case internalServerError
     case serializationError
     case invalidEmail
